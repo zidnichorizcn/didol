@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="category-tabs" style="margin: -30px -40px 0; padding-left: 40px; padding-right: 40px;">
+    <a href="{% url 'product_list' %}" class="{% if not kategori_aktif %}active{% endif %}">Semua</a>
+    <a href="?category={{ 'Kerajinan Kayu'|urlencode }}" class="{% if kategori_aktif == 'Kerajinan Kayu' %}active{% endif %}">Kerajinan Kayu</a>
+    <a href="?category=Mebel" class="{% if kategori_aktif == 'Mebel' %}active{% endif %}">Mebel</a>
+    <a href="?category={{ 'Alat Serbaguna'|urlencode }}" class="{% if kategori_aktif == 'Alat Serbaguna' %}active{% endif %}">Alat Serbaguna</a>
+    <a href="?category={{ 'Kerajinan Umum'|urlencode }}" class="{% if kategori_aktif == 'Kerajinan Umum' %}active{% endif %}">Kerajinan Umum</a>
+    <a href="?category=Lainnya" class="{% if kategori_aktif == 'Lainnya' %}active{% endif %}">Lainnya</a>
+</div>
+
+<div class="filter-row">
+    <span class="filter-label">Barang:</span>
+    <a href="?category={{ kategori_aktif|default:'' }}&kondisi=Ready" class="filter-chip {% if kondisi_aktif == 'Ready' %}active{% endif %}">Ready</a>
+    <a href="?category={{ kategori_aktif|default:'' }}&kondisi=PreOrder" class="filter-chip {% if kondisi_aktif == 'PreOrder' %}active{% endif %}">Pre Order</a>
+    {% if kondisi_aktif %}
+        <a href="?category={{ kategori_aktif|default:'' }}" class="filter-chip clear">✕ Hapus filter</a>
+    {% endif %}
+</div>
+
+<div class="page-header">
+    <div>
+        <h2>Kategori: {{ kategori_aktif|default:"Semua" }}</h2>
+        {% if query %}
+            <p class="helper-text" style="margin-top: 4px;">Hasil pencarian untuk "<strong>{{ query }}</strong>" — {{ products|length }} produk ditemukan</p>
+        {% endif %}
+    </div>
+    {% if user.is_authenticated %}
+        <a href="{% url 'product_create' %}" class="btn btn-primary">+ Tambah Produk Baru</a>
+    {% endif %}
+</div>
+
+<div class="product-grid">
+    {% for product in products %}
+        <a href="{% url 'product_detail' product.pk %}" class="card-link">
+            <div class="product-card">
+                {% if product.foto %}
+                    <img src="{{ product.foto.url }}" alt="{{ product.nama }}">
+                {% else %}
+                    <div class="no-image">Tidak ada foto</div>
+                {% endif %}
+                <div class="info">
+                    <h3>{{ product.nama }}</h3>
+                    <div class="badge-row">
+                        <span class="badge">{{ product.get_kondisi_display }}</span>
+                        {% if product.jumlah_terjual > 0 %}
+                            <span class="badge badge-sold">Terjual {{ product.jumlah_terjual }}</span>
+                        {% endif %}
+                    </div>
+                    <p class="location">📍 {{ product.lokasi }}</p>
+                    <p class="harga">Rp {{ product.harga_tampil }}</p>
+                </div>
+            </div>
+        </a>
+    {% empty %}
+        <div class="empty-state">
+            <p style="font-size: 40px; margin: 0;">📦</p>
+            <p>Belum ada produk yang cocok.</p>
+        </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

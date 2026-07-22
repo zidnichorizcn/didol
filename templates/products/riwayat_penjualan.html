@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h2>Riwayat Penjualan</h2>
+        <p class="helper-text" style="margin-top: 4px;">Semua transaksi yang sudah kamu catat.</p>
+    </div>
+    <a href="{% url 'dashboard' %}" class="btn btn-outline">Kembali ke Dashboard</a>
+</div>
+
+<div class="form-card" style="margin-bottom: 24px;">
+    <p class="helper-text" style="margin: 0 0 6px;">Total Pendapatan Keseluruhan</p>
+    <p style="font-size: 26px; font-weight: 800; margin: 0; color: var(--success);">Rp {{ total_pendapatan }}</p>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>Tanggal</th>
+            <th>Produk</th>
+            <th>Jumlah</th>
+            <th>Harga Satuan</th>
+            <th>Subtotal</th>
+            <th>Aksi</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for r in riwayat %}
+        <tr>
+            <td>{{ r.tanggal|date:"d M Y, H:i" }}</td>
+            <td><strong>{{ r.product.nama }}</strong></td>
+            <td>{{ r.jumlah }} pcs</td>
+            <td>Rp {{ r.harga_saat_itu }}</td>
+            <td>Rp {{ r.subtotal }}</td>
+            <td>
+                <form method="post" action="{% url 'riwayat_delete' r.pk %}" onsubmit="return confirm('Hapus catatan penjualan ini? Jumlah terjual produk akan ikut dikurangi.');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-link" style="background:none; border:none; cursor:pointer; font: inherit; color: var(--primary); padding: 0;">Hapus</button>
+                </form>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6" class="empty-state">Belum ada riwayat penjualan. Yuk mulai catat penjualan dari dashboard!</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

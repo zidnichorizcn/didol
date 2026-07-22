@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div style="display: flex; gap: 40px; flex-wrap: wrap;">
+
+    <div style="flex: 1; min-width: 300px;">
+        {% if product.foto %}
+            <img id="main-image" src="{{ product.foto.url }}" alt="{{ product.nama }}" style="width: 100%; border-radius: 12px; object-fit: cover; max-height: 450px;">
+        {% endif %}
+
+        {% if product.images.all %}
+        <div style="display: flex; gap: 10px; margin-top: 12px;">
+            {% if product.foto %}
+                <img src="{{ product.foto.url }}"
+                     onclick="document.getElementById('main-image').src = this.src; document.querySelectorAll('.thumb-img').forEach(function(t){ t.style.borderColor = '#e5e7eb'; }); this.style.borderColor = '#e53935';"
+                     class="thumb-img"
+                     alt="Foto utama"
+                     style="width: 90px; height: 90px; border-radius: 8px; object-fit: cover; border: 2px solid #e53935; cursor: pointer;">
+            {% endif %}
+            {% for img in product.images.all %}
+                <img src="{{ img.foto.url }}"
+                     onclick="document.getElementById('main-image').src = this.src; document.querySelectorAll('.thumb-img').forEach(function(t){ t.style.borderColor = '#e5e7eb'; }); this.style.borderColor = '#e53935';"
+                     class="thumb-img"
+                     alt="Foto tambahan"
+                     style="width: 90px; height: 90px; border-radius: 8px; object-fit: cover; border: 2px solid #e5e7eb; cursor: pointer;">
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+
+    <div style="flex: 1; min-width: 300px;">
+        <div class="badge-row">
+    <span class="badge">{{ product.get_kondisi_display }}</span>
+    {% if product.jumlah_terjual > 0 %}
+        <span class="badge badge-sold">Terjual {{ product.jumlah_terjual }}</span>
+    {% endif %}
+</div>
+<h1 style="margin: 12px 0 4px;">{{ product.nama }}</h1>
+        <p class="location">📍 {{ product.lokasi }}</p>
+        <p class="harga" style="font-size: 28px;">Rp {{ product.harga_tampil }}</p>
+        {% if product.sembunyikan_harga %}
+            <p class="helper-text" style="margin-top: -14px;">Harga tersamar — hubungi penjual untuk info lengkap</p>
+        {% endif %}
+        {% if product.kondisi == "Ready" %}
+    {% if product.stok == 0 %}
+        <p class="helper-text" style="color: var(--primary); font-weight: 600;">Stok habis</p>
+    {% else %}
+        <p class="helper-text">Stok tersedia: {{ product.stok }} pcs</p>
+    {% endif %}
+{% endif %}
+
+        <div class="form-card" style="max-width: 100%; margin-top: 20px;">
+            <p style="margin: 0 0 6px;"><strong>Kategori:</strong> {{ product.kategori }}</p>
+            {% if product.brand %}
+                <p style="margin: 0 0 6px;"><strong>Brand:</strong> {{ product.brand }}</p>
+            {% endif %}
+            <p style="margin: 0;"><strong>Dijual oleh:</strong> {{ product.penjual.username }}</p>
+        </div>
+
+        {% if product.spesifikasi %}
+        <div class="form-card" style="max-width: 100%; margin-top: 16px;">
+            <p style="margin: 0 0 8px; font-weight: 700;">Spesifikasi Produk</p>
+            <p style="margin: 0; white-space: pre-line; color: var(--gray);">{{ product.spesifikasi }}</p>
+        </div>
+        {% endif %}
+
+        <a href="https://wa.me/{{ product.no_wa }}?text=Halo%2C%20saya%20tertarik%20dengan%20produk%20{{ product.nama|urlencode }}%20-%20{{ product_url|urlencode }}"
+           target="_blank"
+           class="btn"
+           style="background: #25D366; color: #fff; margin-top: 20px; display: inline-flex; align-items: center; gap: 8px;">
+            💬 Hubungi via WhatsApp
+        </a>
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="page-header">
+    <h2>Semua Produk (Superuser)</h2>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>Foto</th>
+            <th>Nama Produk</th>
+            <th>Penjual</th>
+            <th>Kategori</th>
+            <th>Harga</th>
+            <th>Status</th>
+            <th>Aksi</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for product in products %}
+        <tr>
+            <td>
+                {% if product.foto %}
+                    <img src="{{ product.foto.url }}" width="50" height="50">
+                {% endif %}
+            </td>
+            <td><strong>{{ product.nama }}</strong></td>
+            <td>{{ product.penjual.username }}</td>
+            <td>{{ product.kategori }}</td>
+            <td>Rp {{ product.harga }}</td>
+            <td><span class="status-badge">{{ product.get_status_display }}</span></td>
+            <td>
+                <a href="{% url 'product_delete' product.pk %}" class="btn-link" style="color: var(--primary);">Hapus</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" class="empty-state">Belum ada produk sama sekali.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

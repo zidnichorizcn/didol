@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>{{ form.instance.pk|yesno:"Edit Produk,Tambah Produk Baru" }}</h2>
+<p class="helper-text">Isi detail produk kamu di bawah ini. Foto utama wajib, boleh tambah maksimal 2 foto lagi.</p>
+
+<div class="form-card">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <h3 style="font-size: 16px; margin-top: 24px;">Foto Tambahan (opsional, maksimal 2)</h3>
+        {{ formset.management_form }}
+        {% for image_form in formset %}
+            <div style="border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin-bottom: 12px;">
+                {{ image_form.foto.label_tag }}
+                {{ image_form.foto }}
+                {% if image_form.instance.pk %}
+                    <label style="display: flex; align-items: center; gap: 6px; margin-top: 8px; font-weight: 400;">
+                        {{ image_form.DELETE }} Hapus foto ini
+                    </label>
+                {% endif %}
+                {{ image_form.id }}
+            </div>
+        {% endfor %}
+
+        <button type="submit" class="btn btn-primary">Simpan Produk</button>
+    </form>
+</div>
+
+{% endblock %}
