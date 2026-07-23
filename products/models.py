@@ -1,5 +1,24 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from PIL import Image
+import os
+
+def optimize_image(image_field, max_width=1200, quality=80):
+    if not image_field:
+        return
+    path = image_field.path
+    try:
+        img = Image.open(path)
+        if img.mode in ("RGBA", "P"):
+            img = img.convert("RGB")
+        if img.width > max_width:
+            ratio = max_width / float(img.width)
+            new_height = int(img.height * ratio)
+            img = img.resize((max_width, new_height), Image.LANCZOS)
+        img.save(path, quality=quality, optimize=True)
+    except Exception:
+        pass
+
 
 class Product(models.Model):
     CATEGORY_CHOICES = [
@@ -37,6 +56,11 @@ class Product(models.Model):
     def __str__(self):
         return self.nama
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.foto:
+            optimize_image(self.foto)
+
     def harga_tampil(self):
         if self.sembunyikan_harga:
             harga_str = str(self.harga)
@@ -57,6 +81,11 @@ class ProductImage(models.Model):
 
     def __str__(self):
         return f"Foto tambahan - {self.product.nama}"
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.foto:
+            optimize_image(self.foto)
 
 
 class SaleRecord(models.Model):
