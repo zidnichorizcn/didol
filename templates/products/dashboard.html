@@ -27,6 +27,7 @@
             <th>Nama Produk</th>
             <th>Kategori</th>
             <th>Harga</th>
+            <th>Stok</th>
             <th>Terjual</th>
             <th>Aksi</th>
         </tr>
@@ -40,6 +41,17 @@
             <td><strong>{{ product.nama }}</strong></td>
             <td>{{ product.kategori }}</td>
             <td>Rp {{ product.harga }}</td>
+            <td>
+                {% if product.kondisi == "Ready" %}
+                    {% if product.stok == 0 %}
+                        <span class="status-badge" style="background:#ffebee; color:var(--primary);">Habis</span>
+                    {% else %}
+                        {{ product.stok }} pcs
+                    {% endif %}
+                {% else %}
+                    <span style="color: var(--gray);">PO</span>
+                {% endif %}
+            </td>
             <td><span class="status-badge">{{ product.jumlah_terjual }} pcs</span></td>
             <td>
                 <a href="{% url 'product_update' product.pk %}" class="btn-link">Edit</a>
@@ -52,6 +64,10 @@
                 &nbsp;&middot;&nbsp;
                 <a href="{% url 'product_delete' product.pk %}" class="btn-link" style="color: var(--primary);">Hapus</a>
             </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="7" class="empty-state">Kamu belum punya produk. Yuk tambah produk pertama!</td>
         </tr>
         {% endfor %}
     </tbody>
