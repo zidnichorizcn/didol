@@ -1,21 +1,31 @@
 from django.db import models
 from django.contrib.auth import get_user_model
-from PIL import Image
-import os
+from PIL import Image, ImageOps
 
-def optimize_image(image_field, max_width=1200, quality=80):
+def optimize_image(image_field, max_width=1280, quality=85):
     if not image_field:
         return
     path = image_field.path
     try:
         img = Image.open(path)
+        img = ImageOps.exif_transpose(img)  # perbaiki rotasi foto dari HP
+
         if img.mode in ("RGBA", "P"):
+            background = Image.new("RGB", img.size, (255, 255, 255))
+            if img.mode == "RGBA":
+                background.paste(img, mask=img.split()[3])
+            else:
+                background.paste(img.convert("RGBA"), mask=img.convert("RGBA").split()[3])
+            img = background
+        elif img.mode != "RGB":
             img = img.convert("RGB")
+
         if img.width > max_width:
             ratio = max_width / float(img.width)
             new_height = int(img.height * ratio)
             img = img.resize((max_width, new_height), Image.LANCZOS)
-        img.save(path, quality=quality, optimize=True)
+
+        img.save(path, format="JPEG", quality=quality, optimize=True, progressive=True)
     except Exception:
         pass
 
