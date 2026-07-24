@@ -1,14 +1,18 @@
+
 {% extends "base.html" %}
 {% block content %}
 
 <h2>Login Penjual</h2>
-
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Login</button>
-</form>
-
-<p>Belum punya akun? <a href="{% url 'register' %}">Daftar di sini</a></p>
+<div class="form-card">
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Login</button>
+    </form>
+    <p class="helper-text" style="margin-top: 16px;">
+        <a href="{% url 'password_reset' %}" class="btn-link">Lupa kata sandi?</a>
+    </p>
+    <p class="helper-text" style="margin-top: 4px;">Belum punya akun? <a href="{% url 'register' %}" class="btn-link">Daftar di sini</a></p>
+</div>
 
 {% endblock %}
