@@ -3,10 +3,9 @@
 
 <div class="category-tabs" style="margin: -30px -40px 0; padding-left: 40px; padding-right: 40px;">
     <a href="{% url 'product_list' %}" class="{% if not kategori_aktif %}active{% endif %}">Semua</a>
-    <a href="?category={{ 'Kerajinan Kayu'|urlencode }}" class="{% if kategori_aktif == 'Kerajinan Kayu' %}active{% endif %}">Kerajinan Kayu</a>
-    <a href="?category=Mebel" class="{% if kategori_aktif == 'Mebel' %}active{% endif %}">Mebel</a>
+    <a href="?category=Kerajinan" class="{% if kategori_aktif == 'Kerajinan' %}active{% endif %}">Kerajinan</a>
+    <a href="?category=Furniture" class="{% if kategori_aktif == 'Furniture' %}active{% endif %}">Furniture</a>
     <a href="?category={{ 'Alat Serbaguna'|urlencode }}" class="{% if kategori_aktif == 'Alat Serbaguna' %}active{% endif %}">Alat Serbaguna</a>
-    <a href="?category={{ 'Kerajinan Umum'|urlencode }}" class="{% if kategori_aktif == 'Kerajinan Umum' %}active{% endif %}">Kerajinan Umum</a>
     <a href="?category=Lainnya" class="{% if kategori_aktif == 'Lainnya' %}active{% endif %}">Lainnya</a>
 </div>
 

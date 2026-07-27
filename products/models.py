@@ -32,10 +32,9 @@ def optimize_image(image_field, max_width=1280, quality=85):
 
 class Product(models.Model):
     CATEGORY_CHOICES = [
-        ("Kerajinan Kayu", "Kerajinan Kayu"),
-        ("Mebel", "Mebel"),
+        ("Kerajinan", "Kerajinan"),
+        ("Furniture", "Furniture"),
         ("Alat Serbaguna", "Alat Serbaguna"),
-        ("Kerajinan Umum", "Kerajinan Umum"),
         ("Lainnya", "Lainnya"),
     ]
     KONDISI_CHOICES = [
