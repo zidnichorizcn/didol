@@ -4,29 +4,31 @@
 <h2>{% if product %}Edit Produk{% else %}Tambah Produk Baru{% endif %}</h2>
 <p class="helper-text">Isi detail produk kamu di bawah ini.</p>
 
+{% if product %}
+<div class="form-card" style="margin-bottom: 16px;">
+    <p style="margin:0 0 10px; font-weight:700;">Foto saat ini</p>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        {% if product.foto %}
+            <img src="{{ product.foto.url }}" style="width:80px; height:80px; object-fit:cover; border-radius:8px; border:2px solid var(--primary);">
+        {% endif %}
+        {% for img in product.images.all %}
+            <div style="position:relative;">
+                <img src="{{ img.foto.url }}" style="width:80px; height:80px; object-fit:cover; border-radius:8px; border:1px solid var(--border);">
+                <form method="post" action="{% url 'product_image_delete' img.pk %}" style="position:absolute; top:-8px; right:-8px; margin:0;" onsubmit="return confirm('Hapus foto tambahan ini?');">
+                    {% csrf_token %}
+                    <button type="submit" title="Hapus foto ini" style="background:var(--primary); color:#fff; border:none; border-radius:50%; width:22px; height:22px; cursor:pointer; font-size:12px; line-height:1; padding:0;">×</button>
+                </form>
+            </div>
+        {% endfor %}
+    </div>
+    <p class="helper-text" style="margin: 10px 0 0;">Pilih foto baru di form bawah kalau mau ganti/menambah — foto pertama yang dipilih akan jadi foto utama baru.</p>
+</div>
+{% endif %}
+
 <div class="form-card">
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
-
-        {% if product %}
-            <div style="display:flex; gap:10px; flex-wrap:wrap; margin: 8px 0 16px;">
-                {% if product.foto %}
-                    <img src="{{ product.foto.url }}" style="width:80px; height:80px; object-fit:cover; border-radius:8px; border:2px solid var(--primary);">
-                {% endif %}
-                {% for img in product.images.all %}
-                    <div style="position:relative;">
-                        <img src="{{ img.foto.url }}" style="width:80px; height:80px; object-fit:cover; border-radius:8px; border:1px solid var(--border);">
-                        <form method="post" action="{% url 'product_image_delete' img.pk %}" style="position:absolute; top:-8px; right:-8px; margin:0;">
-                            {% csrf_token %}
-                            <button type="submit" title="Hapus foto ini" style="background:var(--primary); color:#fff; border:none; border-radius:50%; width:22px; height:22px; cursor:pointer; font-size:12px; line-height:1; padding:0;">×</button>
-                        </form>
-                    </div>
-                {% endfor %}
-            </div>
-            <p class="helper-text" style="margin-top:-8px;">Foto di atas adalah foto saat ini. Pilih foto baru di form kalau mau ganti/menambah — foto pertama yang dipilih akan jadi foto utama baru.</p>
-        {% endif %}
-
         <button type="submit" class="btn btn-primary">Simpan Produk</button>
     </form>
 </div>
