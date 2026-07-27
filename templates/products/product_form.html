@@ -1,31 +1,47 @@
 {% extends "base.html" %}
 {% block content %}
 
-<h2>{{ form.instance.pk|yesno:"Edit Produk,Tambah Produk Baru" }}</h2>
-<p class="helper-text">Isi detail produk kamu di bawah ini. Foto utama wajib, boleh tambah maksimal 2 foto lagi.</p>
+<h2>{% if product %}Edit Produk{% else %}Tambah Produk Baru{% endif %}</h2>
+<p class="helper-text">Isi detail produk kamu di bawah ini.</p>
 
 <div class="form-card">
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
 
-        <h3 style="font-size: 16px; margin-top: 24px;">Foto Tambahan (opsional, maksimal 2)</h3>
-        {{ formset.management_form }}
-        {% for image_form in formset %}
-            <div style="border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin-bottom: 12px;">
-                {{ image_form.foto.label_tag }}
-                {{ image_form.foto }}
-                {% if image_form.instance.pk %}
-                    <label style="display: flex; align-items: center; gap: 6px; margin-top: 8px; font-weight: 400;">
-                        {{ image_form.DELETE }} Hapus foto ini
-                    </label>
+        {% if product %}
+            <div style="display:flex; gap:10px; flex-wrap:wrap; margin: 8px 0 16px;">
+                {% if product.foto %}
+                    <img src="{{ product.foto.url }}" style="width:80px; height:80px; object-fit:cover; border-radius:8px; border:2px solid var(--primary);">
                 {% endif %}
-                {{ image_form.id }}
+                {% for img in product.images.all %}
+                    <div style="position:relative;">
+                        <img src="{{ img.foto.url }}" style="width:80px; height:80px; object-fit:cover; border-radius:8px; border:1px solid var(--border);">
+                        <form method="post" action="{% url 'product_image_delete' img.pk %}" style="position:absolute; top:-8px; right:-8px; margin:0;">
+                            {% csrf_token %}
+                            <button type="submit" title="Hapus foto ini" style="background:var(--primary); color:#fff; border:none; border-radius:50%; width:22px; height:22px; cursor:pointer; font-size:12px; line-height:1; padding:0;">×</button>
+                        </form>
+                    </div>
+                {% endfor %}
             </div>
-        {% endfor %}
+            <p class="helper-text" style="margin-top:-8px;">Foto di atas adalah foto saat ini. Pilih foto baru di form kalau mau ganti/menambah — foto pertama yang dipilih akan jadi foto utama baru.</p>
+        {% endif %}
 
         <button type="submit" class="btn btn-primary">Simpan Produk</button>
     </form>
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    var input = document.querySelector('input[name="foto_files"]');
+    if (input) {
+        input.addEventListener("change", function () {
+            if (this.files.length > 3) {
+                alert("Maksimal 3 foto. Hanya 3 foto pertama yang akan digunakan.");
+            }
+        });
+    }
+});
+</script>
 
 {% endblock %}

@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
-from .models import Product, SaleRecord
-from .forms import ProductForm, CustomUserCreationForm, ProductImageFormSet
+from .models import Product, ProductImage, SaleRecord
+from .forms import ProductForm, CustomUserCreationForm
 
 def product_list_view(request):
     products = Product.objects.all()
@@ -41,28 +41,27 @@ def product_detail_view(request, pk):
 def product_create_view(request):
     if request.method == "POST":
         form = ProductForm(request.POST, request.FILES)
-        formset = ProductImageFormSet(request.POST, request.FILES)
-        if form.is_valid() and formset.is_valid():
+        if form.is_valid():
             product = form.save(commit=False)
             product.penjual = request.user
-            product.save()
-            formset.instance = product
-            formset.save()
+            product.save()  # foto sampul otomatis tersimpan dari field "foto"
+
+            extra_files = request.FILES.getlist("foto_files")[:3]
+            for f in extra_files:
+                ProductImage.objects.create(product=product, foto=f)
+
             return redirect("product_list")
     else:
         form = ProductForm()
-        formset = ProductImageFormSet()
 
-    return render(request, "products/product_form.html", {"form": form, "formset": formset})
+    return render(request, "products/product_form.html", {"form": form})
 
 
 @login_required
 def dashboard_view(request):
     products = Product.objects.filter(penjual=request.user)
-
     jumlah_terjual = sum(p.jumlah_terjual for p in products)
     total_pendapatan = sum(p.pendapatan() for p in products)
-
     context = {
         "products": products,
         "jumlah_terjual": jumlah_terjual,
@@ -99,16 +98,29 @@ def product_update_view(request, pk):
     product = get_object_or_404(Product, pk=pk, penjual=request.user)
     if request.method == "POST":
         form = ProductForm(request.POST, request.FILES, instance=product)
-        formset = ProductImageFormSet(request.POST, request.FILES, instance=product)
-        if form.is_valid() and formset.is_valid():
-            form.save()
-            formset.save()
+        if form.is_valid():
+            product = form.save()  # foto sampul otomatis terupdate dari field "foto"
+
+            extra_files = request.FILES.getlist("foto_files")[:3]
+            existing_count = product.images.count()
+            slot_left = max(0, 2 - existing_count)
+            for f in extra_files[:slot_left]:
+                ProductImage.objects.create(product=product, foto=f)
+
             return redirect("dashboard")
     else:
         form = ProductForm(instance=product)
-        formset = ProductImageFormSet(instance=product)
 
-    return render(request, "products/product_form.html", {"form": form, "formset": formset})
+    return render(request, "products/product_form.html", {"form": form, "product": product})
+
+
+@login_required
+def product_image_delete_view(request, pk):
+    image = get_object_or_404(ProductImage, pk=pk, product__penjual=request.user)
+    product_pk = image.product.pk
+    if request.method == "POST":
+        image.delete()
+    return redirect("product_update", pk=product_pk)
 
 
 @login_required
@@ -133,17 +145,14 @@ def product_catat_terjual_view(request, pk):
             jumlah = int(request.POST.get("jumlah", 0))
         except ValueError:
             jumlah = 0
-
         if jumlah > 0:
             if product.kondisi == "Ready" and jumlah > product.stok:
                 jumlah = product.stok
-
             if jumlah > 0:
                 product.jumlah_terjual += jumlah
                 if product.kondisi == "Ready":
                     product.stok -= jumlah
                 product.save()
-
                 SaleRecord.objects.create(
                     product=product,
                     penjual=request.user,

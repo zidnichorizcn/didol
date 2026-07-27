@@ -9,6 +9,7 @@ from .views import (
     product_update_view,
     product_delete_view,
     product_catat_terjual_view,
+    product_image_delete_view,
     admin_all_products_view,
 )
 
@@ -19,6 +20,7 @@ urlpatterns = [
     path("riwayat/", riwayat_penjualan_view, name="riwayat_penjualan"),
     path("riwayat/<int:pk>/hapus/", riwayat_delete_view, name="riwayat_delete"),
     path("semua-produk/", admin_all_products_view, name="admin_all_products"),
+    path("foto/<int:pk>/hapus/", product_image_delete_view, name="product_image_delete"),
     path("<int:pk>/", product_detail_view, name="product_detail"),
     path("<int:pk>/edit/", product_update_view, name="product_update"),
     path("<int:pk>/hapus/", product_delete_view, name="product_delete"),

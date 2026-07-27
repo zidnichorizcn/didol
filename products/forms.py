@@ -1,10 +1,39 @@
 from django import forms
-from django.forms import inlineformset_factory
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
-from .models import Product, ProductImage
+from .models import Product
+
+
+class MultipleFileInput(forms.ClearableFileInput):
+    allow_multiple_selected = True
+
+
+class MultipleFileField(forms.FileField):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("widget", MultipleFileInput(attrs={"multiple": True}))
+        super().__init__(*args, **kwargs)
+
+    def clean(self, data, initial=None):
+        single_file_clean = super().clean
+        if isinstance(data, (list, tuple)):
+            result = [single_file_clean(d, initial) for d in data]
+        else:
+            result = single_file_clean(data, initial)
+        return result
+
 
 class ProductForm(forms.ModelForm):
+    foto = forms.ImageField(
+        required=False,
+        label="Foto Sampul",
+        help_text="Pilih 1 foto sebagai sampul/foto utama produk.",
+    )
+    foto_files = MultipleFileField(
+        required=False,
+        label="Foto Tambahan",
+        help_text="Pilih 1-3 foto tambahan untuk produk (opsional).",
+    )
+
     class Meta:
         model = Product
         fields = [
@@ -15,7 +44,6 @@ class ProductForm(forms.ModelForm):
             "no_wa": "Nomor WhatsApp",
             "sembunyikan_harga": "Sensor harga di halaman publik",
             "spesifikasi": "Spesifikasi Produk",
-            "foto": "Foto Utama",
             "stok": "Jumlah Stok",
         }
         widgets = {
@@ -27,16 +55,6 @@ class ProductForm(forms.ModelForm):
             "sembunyikan_harga": "Kalau dicentang, harga akan tampil tersamar, misal Rp 10000 jadi Rp 1xxxx",
             "stok": "Isi jumlah stok kalau kondisi Ready Stock. Untuk Pre Order boleh dikosongkan/isi 0.",
         }
-
-
-ProductImageFormSet = inlineformset_factory(
-    Product,
-    ProductImage,
-    fields=["foto"],
-    extra=2,
-    max_num=2,
-    can_delete=True,
-)
 
 
 class CustomUserCreationForm(UserCreationForm):
