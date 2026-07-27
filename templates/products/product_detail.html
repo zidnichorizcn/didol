@@ -39,10 +39,10 @@
         </div>
         <h1 style="margin: 12px 0 4px;">{{ product.nama }}</h1>
         <p class="location">📍 {{ product.lokasi }}</p>
-        <p class="harga" style="font-size: 28px;">Rp {{ product.harga_tampil }}</p>
+        <p class="harga" style="font-size: 28px; margin-bottom: 4px;">Rp {{ product.harga_tampil }}</p>
         {% if product.sembunyikan_harga %}
-            <p class="helper-text" style="margin-top: -14px;">Harga tersamar — hubungi penjual untuk info lengkap</p>
-        {% endif %}
+        <p class="helper-text" style="margin-top: 0;">Harga tersamar — hubungi penjual untuk info lengkap</p>
+        {% endif %} 
         {% if product.kondisi == "Ready" %}
             {% if product.stok == 0 %}
                 <p class="helper-text" style="color: var(--primary); font-weight: 600;">Stok habis</p>
