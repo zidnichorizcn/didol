@@ -60,6 +60,12 @@ class Product(models.Model):
     no_wa = models.CharField(max_length=20, help_text="Contoh: 6281234567890 (kode negara, tanpa + atau 0 di depan)")
     spesifikasi = models.TextField(blank=True, help_text="Detail ukuran, bahan, berat, cara pakai, dll.")
     foto = models.ImageField(upload_to="produk/", blank=True, null=True, help_text="Foto utama/sampul produk")
+    file_hpp = models.FileField(
+        upload_to="hpp/",
+        blank=True,
+        null=True,
+        help_text="File Excel HPP (Harga Pokok Produksi) — hanya terlihat oleh Anda sendiri, tidak ditampilkan ke pengunjung.",
+    )
     dibuat = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
